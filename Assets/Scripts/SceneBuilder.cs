@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 
 using UnityEngine;
 
@@ -15,8 +16,8 @@ public class SceneBuilder : MonoBehaviour
         // Print Hello
         Debug.Log("Hello");
 
-        readPointCloud("PointCloud/octahedron14");
-        readPointCloud("PointCloud/octahedron6");
+        readPointCloud("octahedron14");
+        readPointCloud("octahedron6");
     }
 
     // Update is called once per frame
@@ -25,11 +26,19 @@ public class SceneBuilder : MonoBehaviour
         
     // }
 
-    void readPointCloud(string path) {
-        // var pointCloudText = Resources.Load<TextAsset>(path);
-        // Debug.Log(pointCloudText.text);
+    void readPointCloud(string filename) {
+        Debug.Log("Reading point cloud " + filename);
 
-        TextAsset textAsset = (TextAsset) Resources.Load(path);
-        Debug.Log(textAsset);
+        // Get text from file
+        string filePath = Application.dataPath + "/PointClouds/" + filename + ".xyz";
+        if (File.Exists(filePath)) {
+            string data = File.ReadAllText(filePath);
+            Debug.Log(data);
+        } else {
+            Debug.Log("Can't find file at " + filePath);
+        }
+
+        // Parse into vector3 array
+
     }
 }
