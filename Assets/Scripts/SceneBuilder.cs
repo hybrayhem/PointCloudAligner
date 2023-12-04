@@ -8,26 +8,27 @@ using UnityEngine;
 public class SceneBuilder : MonoBehaviour
 {
     public Vector3[] pointCloud;
-
+    public GameObject pointCloudGroup;
 
     // Start is called before the first frame update
     void Start()
     {
-        // Print Hello
-        Debug.Log("Hello");
+        pointCloudGroup = new GameObject("PointCloudGroup");
 
-        pointCloud = readPointCloud("octahedron14");
-        pointCloud = readPointCloud("octahedron6");
+        string pcName = "octahedron6";
+        Vector3[] pcData = readPointCloud(pcName);
+        instantiatePointCloud(pointCloudGroup, pcData, pcName);
 
-        printPointCloud(pointCloud);
-        visualizePointCloud(pointCloud);
+        pcName = "octahedron14";
+        pcData = readPointCloud(pcName);
+        pcData = translatePointCloud(pcData, new Vector3(0, 0, 50)); // TODO: remove this
+        instantiatePointCloud(pointCloudGroup, pcData, pcName);
+
+        visualizePointCloudGroup();
     }
 
     // Update is called once per frame
-    // void Update()
-    // {
-        
-    // }
+    // void Update() {}
 
     Vector3[] readPointCloud(string filename) {
         Vector3[] vectors;
@@ -68,24 +69,52 @@ public class SceneBuilder : MonoBehaviour
         }
     }
 
-    void visualizePointCloud(Vector3[] pointCloud) {
-        // To fit point cloud in camera view
-        var visualizationOrigin = new Vector3(0, 0, 7);
-        var downscaleRatio = 0.1f;
-        var pointSize = 0.1f;
+    void visualizePointCloudGroup() {
+        var sceneOrigin = new Vector3(0, 0, 7);
+        var sceneScale = 0.1f;
+        var pointScale = 1.0f;
 
-        Vector3[] newPointCloud;
-        newPointCloud = scalePointCloud(pointCloud, downscaleRatio);
-        newPointCloud = translatePointCloud(newPointCloud, visualizationOrigin);
-
-        foreach (var point in newPointCloud) {
-            // Instantiate a sphere
-            GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            sphere.transform.position = point;
-            sphere.transform.localScale = new Vector3(pointSize, pointSize, pointSize);
+        // Scene adjustments
+        GameObject[] points = GameObject.FindGameObjectsWithTag("PointTag");
+        foreach (var point in points) {
+            point.transform.localScale = Vector3.one * pointScale;
         }
+
+        applyTRS(obj: pointCloudGroup, translation: sceneOrigin, scale: sceneScale);
     }
 
+    GameObject instantiatePointCloud(GameObject parentGroup, Vector3[] pointCloud, string name) {
+        GameObject pcObject = new GameObject(name);
+        pcObject.transform.parent = parentGroup.transform; // Register to point cloud group
+        
+        foreach (var point in pointCloud) {
+            // Instantiate sphere
+            GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            sphere.transform.position = point;
+            sphere.tag = "PointTag";
+
+            // Set sphere color
+            sphere.GetComponent<Renderer>().material.color = Color.red;
+
+            // Register sphere to parent as child
+            sphere.transform.parent = pcObject.transform;
+        }
+
+        return pcObject;
+    }
+
+    // Transform GameObject
+    void applyTRS(GameObject obj, 
+             Vector3 translation = default(Vector3), 
+             Vector3 rotation = default(Vector3), 
+             float scale = 1.0f) 
+    {
+        obj.transform.position += translation;
+        obj.transform.Rotate(rotation);
+        obj.transform.localScale *= scale;
+    }
+
+    // Transform Points one by one
     Vector3[] scalePointCloud(Vector3[] pointCloud, float scale) {
         Vector3[] scaledPointCloud = new Vector3[pointCloud.Length];
 
@@ -94,7 +123,6 @@ public class SceneBuilder : MonoBehaviour
         }
         return scaledPointCloud;
     }
-
     Vector3[] translatePointCloud(Vector3[] pointCloud, Vector3 translation) {
         Vector3[] translatedPointCloud = new Vector3[pointCloud.Length];
 
