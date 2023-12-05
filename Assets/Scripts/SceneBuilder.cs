@@ -20,7 +20,7 @@ public class SceneBuilder : MonoBehaviour
     //                  //
 
     PointCloudProcessor pcProcessor = new PointCloudProcessor();
-    TransformCalculator tfCalculator = new TransformCalculator();
+    TransformSolver tfSolver = new TransformSolver();
 
     // Start is called before the first frame update
     void Start()
@@ -44,7 +44,7 @@ public class SceneBuilder : MonoBehaviour
         // Find transformation between two point clouds
         (Vector3[] P, Vector3[] Q) = pcProcessor.getPandQ(pointCloud1, pointCloud2);
 
-        (Vector3 rotation, Vector3 translation) = tfCalculator.findTransformation(P, Q);
+        (Vector3 rotation, Vector3 translation) = tfSolver.findTransformation(P, Q);
 
         // Visaulize resulting transformation
 
