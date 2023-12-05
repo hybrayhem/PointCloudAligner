@@ -50,7 +50,6 @@ public class SceneBuilder : MonoBehaviour
 
         // Visaulize resulting transformation
 
-        // 
     }
 
     // Update is called once per frame
