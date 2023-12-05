@@ -7,8 +7,17 @@ using UnityEngine;
 // Read and visualize point cloud
 public class SceneBuilder : MonoBehaviour
 {
+    // Scene data
     public Vector3[] pointCloud;
     public GameObject pointCloudGroup;
+
+    // Scene parameters //
+    Vector3 sceneOrigin = new Vector3(0, 0, 7);
+    Vector3 sceneRotation = new Vector3(0, 0, 0);
+    float sceneScale = 0.1f;
+    float pointScale = 1.0f;
+    bool updateScene = false;
+    //                  //
 
     // Start is called before the first frame update
     void Start()
@@ -21,14 +30,22 @@ public class SceneBuilder : MonoBehaviour
 
         pcName = "octahedron14";
         pcData = readPointCloud(pcName);
-        pcData = translatePointCloud(pcData, new Vector3(0, 0, 50)); // TODO: remove this
+        pcData = translatePointCloud(pcData, new Vector3(0, 0, 10)); // TODO: remove this
         instantiatePointCloud(pointCloudGroup, pcData, pcName);
 
-        visualizePointCloudGroup();
+        transformPointCloudGroup();
     }
 
     // Update is called once per frame
-    // void Update() {}
+    void Update() {
+        sceneOrigin = new Vector3(-0.5f, 0, 3); // TODO: remove this
+        updateScene = true;
+
+        if (updateScene) {
+            transformPointCloudGroup();
+            updateScene = false;
+        }
+    }
 
     Vector3[] readPointCloud(string filename) {
         Vector3[] vectors;
@@ -69,18 +86,14 @@ public class SceneBuilder : MonoBehaviour
         }
     }
 
-    void visualizePointCloudGroup() {
-        var sceneOrigin = new Vector3(0, 0, 7);
-        var sceneScale = 0.1f;
-        var pointScale = 1.0f;
-
-        // Scene adjustments
+    void transformPointCloudGroup() {
+        // Scene adjustments to fit in camera view  
         GameObject[] points = GameObject.FindGameObjectsWithTag("PointTag");
         foreach (var point in points) {
             point.transform.localScale = Vector3.one * pointScale;
         }
 
-        applyTRS(obj: pointCloudGroup, translation: sceneOrigin, scale: sceneScale);
+        applyTRSAbsolute(obj: pointCloudGroup, translation: sceneOrigin, rotation: sceneRotation, scale: sceneScale);
     }
 
     GameObject instantiatePointCloud(GameObject parentGroup, Vector3[] pointCloud, string name) {
@@ -104,7 +117,7 @@ public class SceneBuilder : MonoBehaviour
     }
 
     // Transform GameObject
-    void applyTRS(GameObject obj, 
+    void applyTRSRelative(GameObject obj, 
              Vector3 translation = default(Vector3), 
              Vector3 rotation = default(Vector3), 
              float scale = 1.0f) 
@@ -112,6 +125,16 @@ public class SceneBuilder : MonoBehaviour
         obj.transform.position += translation;
         obj.transform.Rotate(rotation);
         obj.transform.localScale *= scale;
+    }
+
+    void applyTRSAbsolute(GameObject obj, 
+             Vector3 translation = default(Vector3), 
+             Vector3 rotation = default(Vector3), 
+             float scale = 1.0f) 
+    {
+        obj.transform.position = translation;
+        obj.transform.rotation = Quaternion.Euler(rotation);
+        obj.transform.localScale = Vector3.one * scale;
     }
 
     // Transform Points one by one
