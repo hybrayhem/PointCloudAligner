@@ -5,7 +5,7 @@ using UnityEngine;
 public class TransformCalculator : MonoBehaviour
 {
 
-    void findTransformation() {
+    public (Vector3, Vector3) findTransformation() {
         // Find transformation between two point clouds
         // 1. Find centroids
         // 2. Find covariance matrix
@@ -31,6 +31,8 @@ public class TransformCalculator : MonoBehaviour
 
         // // 6. Apply transformation
         // applyTRSAbsolute(obj: pointCloudGroup, translation: translationVector, rotation: rotationMatrix.eulerAngles, scale: sceneScale);
+
+        return (new Vector3(0, 0, 0), new Vector3(0, 0, 0));
     }
 
     // Vector3 findCentroid(Vector3[] pointCloud) {

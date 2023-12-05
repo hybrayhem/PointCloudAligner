@@ -1,15 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 
 public class PointCloudProcessor : MonoBehaviour
 {
 
-    void fitPointCloudGroupToCameraView(float pointScale = 1.0f,
-                                        float sceneScale = 1.0f, 
-                                        Vector3 sceneOrigin = default(Vector3), 
-                                        Vector3 sceneRotation = default(Vector3), 
-                                        GameObject pointCloudGroup = default(GameObject)) 
+    public void fitPointCloudGroupToCameraView(float pointScale, float sceneScale, 
+                                        Vector3 sceneOrigin, Vector3 sceneRotation, 
+                                        GameObject pointCloudGroup) 
     {
         // Scene adjustments to fit in camera view  
         GameObject[] points = GameObject.FindGameObjectsWithTag("PointTag");
@@ -20,7 +19,7 @@ public class PointCloudProcessor : MonoBehaviour
         applyTRSAbsolute(obj: pointCloudGroup, translation: sceneOrigin, rotation: sceneRotation, scale: sceneScale);
     }
 
-    GameObject instantiatePointCloud(GameObject parentGroup, Vector3[] pointCloud, string name) {
+    public GameObject instantiatePointCloud(GameObject parentGroup, Vector3[] pointCloud, string name) {
         GameObject pcObject = new GameObject(name);
         pcObject.transform.parent = parentGroup.transform; // Register to point cloud group
         
@@ -41,7 +40,7 @@ public class PointCloudProcessor : MonoBehaviour
     }
 
     // Transform GameObject
-    void applyTRSRelative(GameObject obj, 
+    public void applyTRSRelative(GameObject obj, 
              Vector3 translation = default(Vector3), 
              Vector3 rotation = default(Vector3), 
              float scale = 1.0f) 
@@ -51,7 +50,7 @@ public class PointCloudProcessor : MonoBehaviour
         obj.transform.position += translation;
     }
 
-    void applyTRSAbsolute(GameObject obj, 
+    public void applyTRSAbsolute(GameObject obj, 
              Vector3 translation = default(Vector3), 
              Vector3 rotation = default(Vector3), 
              float scale = 1.0f) 
@@ -62,7 +61,7 @@ public class PointCloudProcessor : MonoBehaviour
     }
 
     // Transform Points one by one
-    Vector3[] applyTRSPointCloud(Vector3[] pointCloud, 
+    public Vector3[] applyTRSPointCloud(Vector3[] pointCloud, 
              Vector3 translation = default(Vector3), 
              Vector3 rotation = default(Vector3), 
              float scale = 1.0f) 
@@ -80,13 +79,13 @@ public class PointCloudProcessor : MonoBehaviour
         return transformedPointCloud;
     }
 
-    void printPointCloud(Vector3[] pointCloud) {
+    public void printPointCloud(Vector3[] pointCloud) {
         foreach (var point in pointCloud) {
             Debug.Log(point);
         }
     }
 
-    Vector3[] readPointCloud(string filename) {
+    public Vector3[] readPointCloud(string filename) {
         Vector3[] vectors;
 
         // Get text from file
