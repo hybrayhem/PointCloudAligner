@@ -6,6 +6,20 @@ using System.IO;
 public class PointCloudProcessor : MonoBehaviour
 {
 
+    public (Vector3[], Vector3[]) getPandQ(Vector3[] pointCloud1, Vector3[] pointCloud2) {
+        Vector3[] P = new Vector3[3];
+        P[0] = pointCloud1[0];
+        P[1] = pointCloud1[1];
+        P[2] = pointCloud1[2];
+
+        Vector3[] Q = new Vector3[3];
+        Q[0] = pointCloud2[0];
+        Q[1] = pointCloud2[1];
+        Q[2] = pointCloud2[2];
+
+        return (P, Q);
+    }
+
     public void fitPointCloudGroupToCameraView(float pointScale, float sceneScale, 
                                         Vector3 sceneOrigin, Vector3 sceneRotation, 
                                         GameObject pointCloudGroup) 

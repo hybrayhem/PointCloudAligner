@@ -5,20 +5,27 @@ using UnityEngine;
 public class TransformCalculator : MonoBehaviour
 {
 
-    public (Vector3, Vector3) findTransformation() {
+    // P and Q are both set of 3 points
+    public (Vector3, Vector3) findTransformation(Vector3[] P, Vector3[] Q) { // (Matrix3x3 P, Matrix3x3 Q)
         // Find transformation between two point clouds
         // 1. Find centroids
         // 2. Find covariance matrix
         // 3. Find SVD of covariance matrix
         // 4. Find rotation matrix
         // 5. Find translation vector
+        Debug.Log("P: " + P[0] + ", " + P[1] + ", " + P[2]);
+        Debug.Log("Q: " + Q[0] + ", " + Q[1] + ", " + Q[2]);
 
         // // 1. Find centroids
-        // Vector3 centroid1 = findCentroid(pointCloud1);
-        // Vector3 centroid2 = findCentroid(pointCloud2);
+        Vector3 centroid_P = findCentroid(P);
+        Vector3 centroid_Q = findCentroid(Q);
+        Debug.Log("Centroid P: " + centroid_P);
+        Debug.Log("Centroid Q: " + centroid_Q);
+        
 
         // // 2. Find covariance matrix
-        // Matrix4x4 covarianceMatrix = findCovarianceMatrix(pointCloud1, pointCloud2, centroid1, centroid2);
+        Matrix4x4 H = findCovarianceMatrix(P, Q, centroid_P, centroid_Q);
+        Debug.Log("H: " + H[0] + ", " + H[1] + ", " + H[2]);
 
         // // 3. Find SVD of covariance matrix
         // Matrix4x4 svdMatrix = findSVD(covarianceMatrix);
@@ -35,53 +42,37 @@ public class TransformCalculator : MonoBehaviour
         return (new Vector3(0, 0, 0), new Vector3(0, 0, 0));
     }
 
-    // Vector3 findCentroid(Vector3[] pointCloud) {
-    //     Vector3 centroid = new Vector3(0, 0, 0);
+    Vector3 findCentroid(Vector3[] points) {
+        Vector3 centroid = new Vector3(0, 0, 0);
 
-    //     foreach (var point in pointCloud) {
-    //         centroid += point;
-    //     }
+        foreach (var point in points) {
+            centroid += point;
+        }
 
-    //     centroid /= pointCloud.Length;
+        centroid /= points.Length;
 
-    //     return centroid;
-    // }
+        return centroid;
+    }
 
-    // Matrix4x4 findCovarianceMatrix(Vector3[] pointCloud1, Vector3[] pointCloud2, Vector3 centroid1, Vector3 centroid2) {
-    //     Matrix4x4 covarianceMatrix = new Matrix4x4();
+    Matrix4x4 findCovarianceMatrix(Vector3[] P, Vector3[] Q, Vector3 centroid_P, Vector3 centroid_Q) {
+        Matrix4x4 covarianceMatrix = new Matrix4x4();
 
-    //     for (int i = 0; i < pointCloud1.Length; i++) {
-    //         Vector3 point1 = pointCloud1[i];
-    //         Vector3 point2 = pointCloud2[i];
+        // Vector3 P_mean = P - centroid_P;
+        // Vector3 Q_mean = Q - centroid_Q;
+        // Debug.Log("P_mean: " + P_mean[0] + ", " + P_mean[1] + ", " + P_mean[2]);
+        // Debug.Log("Q_mean: " + Q_mean[0] + ", " + Q_mean[1] + ", " + Q_mean[2]);
+        
+        // Vector3 Q_mean_transpose = Q_mean.transpose();
+        // Debug.Log("Q_mean_transpose: " + Q_mean_transpose[0] + ", " + Q_mean_transpose[1] + ", " + Q_mean_transpose[2]);
 
-    //         Vector3 point1Diff = point1 - centroid1;
-    //         Vector3 point2Diff = point2 - centroid2;
+        // // P_mean dot Q_mean_transpose
+        // covarianceMatrix = Vector3.Dot(P_mean, Q_mean_transpose);
+        // // Debug.Log("covarianceMatrix: " + covarianceMatrix[0] + ", " + covarianceMatrix[1] + ", " + covarianceMatrix[2]);
 
-    //         covarianceMatrix.m00 += point1Diff.x * point2Diff.x;
-    //         covarianceMatrix.m01 += point1Diff.x * point2Diff.y;
-    //         covarianceMatrix.m02 += point1Diff.x * point2Diff.z;
-    //         covarianceMatrix.m03 += point1Diff.x;
+        
 
-    //         covarianceMatrix.m10 += point1Diff.y * point2Diff.x;
-    //         covarianceMatrix.m11 += point1Diff.y * point2Diff.y;
-    //         covarianceMatrix.m12 += point1Diff.y * point2Diff.z;
-    //         covarianceMatrix.m13 += point1Diff.y;
-
-    //         covarianceMatrix.m20 += point1Diff.z * point2Diff.x;
-    //         covarianceMatrix.m21 += point1Diff.z * point2Diff.y;
-    //         covarianceMatrix.m22 += point1Diff.z * point2Diff.z;
-    //         covarianceMatrix.m23 += point1Diff.z;
-
-    //         covarianceMatrix.m30 += point1Diff.x;
-    //         covarianceMatrix.m31 += point1Diff.y;
-    //         covarianceMatrix.m32 += point1Diff.z;
-    //         covarianceMatrix.m33 += 1;
-    //     }
-
-    //     covarianceMatrix /= pointCloud1.Length;
-
-    //     return covarianceMatrix;
-    // }
+        return covarianceMatrix;
+    }
 
     // Matrix4x4 findSVD(Matrix4x4 covarianceMatrix) {
     //     Matrix4x4 svdMatrix = new Matrix4x4();

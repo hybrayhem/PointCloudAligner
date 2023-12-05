@@ -28,21 +28,23 @@ public class SceneBuilder : MonoBehaviour
         // Create PointCloudGroup and child point clouds
         pointCloudGroup = new GameObject("PointCloudGroup");
 
-        string pcName = "octahedron6";
-        Vector3[] pcData = pcProcessor.readPointCloud(pcName);
+        string pcName1 = "octahedron6";
+        Vector3[] pointCloud1 = pcProcessor.readPointCloud(pcName1);
         // pcData = pcProcessor.applyTRSPointCloud(pcData, translation: new Vector3(0, 0, 0));
-        pcProcessor.instantiatePointCloud(pointCloudGroup, pcData, pcName);
+        pcProcessor.instantiatePointCloud(pointCloudGroup, pointCloud1, pcName1);
 
-        pcName = "octahedron6";
-        pcData = pcProcessor.readPointCloud(pcName);
-        pcData = pcProcessor.applyTRSPointCloud(pcData, translation: new Vector3(15, 5, 0), rotation: new Vector3(0, 0, 90));
-        pcProcessor.instantiatePointCloud(pointCloudGroup, pcData, pcName + "_t");
+        string pcName2 = "octahedron6";
+        pointCloud2 = pcProcessor.readPointCloud(pcName2);
+        pointCloud2 = pcProcessor.applyTRSPointCloud(pointCloud2, translation: new Vector3(15, 5, 0), rotation: new Vector3(0, 0, 90));
+        pcProcessor.instantiatePointCloud(pointCloudGroup, pointCloud2, pcName2 + "_t");
 
         // Fit point cloud group to camera view
         pcProcessor.fitPointCloudGroupToCameraView(pointScale, sceneScale, sceneOrigin, sceneRotation, pointCloudGroup);
 
         // Find transformation between two point clouds
-        (Vector3 rotation, Vector3 translation) = tfCalculator.findTransformation();
+        (Vector3[] P, Vector3[] Q) = pcProcessor.getPandQ(pointCloud1, pointCloud2);
+
+        (Vector3 rotation, Vector3 translation) = tfCalculator.findTransformation(P, Q);
 
         // Visaulize resulting transformation
 
