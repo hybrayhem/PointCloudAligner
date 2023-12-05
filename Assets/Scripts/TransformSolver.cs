@@ -5,8 +5,40 @@ using UnityEngine;
 public class TransformSolver : MonoBehaviour
 {
 
+    public (Matrix4x4, Vector3) findTransformation(Vector3[] P, Vector3[] Q) {
+        // 1. Compute centroids of P and Q
+        Vector3 centroid_P = findCentroid(P);
+        Vector3 centroid_Q = findCentroid(Q);
+
+        // 2. Subtract centroids from P and Q
+        Vector3[] P_centered3 = substract(P, centroid_P);
+        Vector3[] Q_centered3 = substract(Q, centroid_Q);
+        
+        Vector4[] Q_centered4 = new Vector4[3];
+        for (int i = 0; i < 3; i++) {
+            Q_centered4[i] = new Vector4(Q_centered3[i][0], Q_centered3[i][1], Q_centered3[i][2], 1);
+        }
+
+        // 3. Use KabschSolver to find the optimal rotation matrix
+        KabschSolver kabschSolver = new KabschSolver();
+        Matrix4x4 rotationMatrix = kabschSolver.SolveKabsch(P_centered3, Q_centered4);
+
+        // 4. Compute the optimal translation vector
+        Vector3 translationVector = centroid_Q - MultiplyPoint3x4(rotationMatrix, centroid_P);
+
+        return (rotationMatrix, translationVector);
+    }
+
+    Vector3 MultiplyPoint3x4(Matrix4x4 matrix, Vector3 point) {
+        return new Vector3(
+            matrix.m00 * point.x + matrix.m01 * point.y + matrix.m02 * point.z + matrix.m03,
+            matrix.m10 * point.x + matrix.m11 * point.y + matrix.m12 * point.z + matrix.m13,
+            matrix.m20 * point.x + matrix.m21 * point.y + matrix.m22 * point.z + matrix.m23
+        );
+    }
+
     // P and Q are both set of 3 points
-    public (Vector3, Vector3) findTransformation(Vector3[] P, Vector3[] Q) { // (Matrix3x3 P, Matrix3x3 Q)
+    public (Vector3, Vector3) _findTransformation(Vector3[] P, Vector3[] Q) { // (Matrix3x3 P, Matrix3x3 Q)
         Debug.Log("P: " + P[0] + ", " + P[1] + ", " + P[2]);
         Debug.Log("Q: " + Q[0] + ", " + Q[1] + ", " + Q[2]);
 
@@ -38,7 +70,7 @@ public class TransformSolver : MonoBehaviour
     Matrix4x4 findSVD(Matrix4x4 covarianceMatrix) {
         Matrix4x4 svdMatrix = new Matrix4x4();
 
-        
+        // To be implemented...
 
         return svdMatrix;
     }

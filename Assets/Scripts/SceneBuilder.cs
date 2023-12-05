@@ -44,7 +44,9 @@ public class SceneBuilder : MonoBehaviour
         // Find transformation between two point clouds
         (Vector3[] P, Vector3[] Q) = pcProcessor.getPandQ(pointCloud1, pointCloud2);
 
-        (Vector3 rotation, Vector3 translation) = tfSolver.findTransformation(P, Q);
+        (Matrix4x4 rotation, Vector3 translation) = tfSolver.findTransformation(P, Q);
+        Debug.Log("Rotation: " + rotation);
+        Debug.Log("Translation: " + translation);
 
         // Visaulize resulting transformation
 
