@@ -12,9 +12,9 @@ public class SceneBuilder : MonoBehaviour
     public GameObject pointCloudGroup;
 
     // Scene parameters //
-    Vector3 sceneOrigin = new Vector3(0, 0, 7);
+    Vector3 sceneOrigin = new Vector3(0, 0, 0.3f); // 30cm away from camera
     Vector3 sceneRotation = new Vector3(0, 0, 0);
-    float sceneScale = 0.1f;
+    float sceneScale = 1f/50;
     float pointScale = 1.0f;
     bool updateScene = false;
     //                  //
@@ -26,21 +26,19 @@ public class SceneBuilder : MonoBehaviour
 
         string pcName = "octahedron6";
         Vector3[] pcData = readPointCloud(pcName);
+        pcData = applyTRSPointCloud(pcData, translation: new Vector3(-8, 0, 0));
         instantiatePointCloud(pointCloudGroup, pcData, pcName);
 
-        pcName = "octahedron14";
+        pcName = "octahedron6";
         pcData = readPointCloud(pcName);
-        pcData = translatePointCloud(pcData, new Vector3(0, 0, 10)); // TODO: remove this
-        instantiatePointCloud(pointCloudGroup, pcData, pcName);
+        pcData = applyTRSPointCloud(pcData, translation: new Vector3(8, 0, 0));
+        instantiatePointCloud(pointCloudGroup, pcData, pcName + "_t");
 
         transformPointCloudGroup();
     }
 
     // Update is called once per frame
     void Update() {
-        sceneOrigin = new Vector3(-0.5f, 0, 3); // TODO: remove this
-        updateScene = true;
-
         if (updateScene) {
             transformPointCloudGroup();
             updateScene = false;
@@ -122,9 +120,9 @@ public class SceneBuilder : MonoBehaviour
              Vector3 rotation = default(Vector3), 
              float scale = 1.0f) 
     {
-        obj.transform.position += translation;
-        obj.transform.Rotate(rotation);
         obj.transform.localScale *= scale;
+        obj.transform.Rotate(rotation);
+        obj.transform.position += translation;
     }
 
     void applyTRSAbsolute(GameObject obj, 
@@ -132,27 +130,27 @@ public class SceneBuilder : MonoBehaviour
              Vector3 rotation = default(Vector3), 
              float scale = 1.0f) 
     {
-        obj.transform.position = translation;
-        obj.transform.rotation = Quaternion.Euler(rotation);
         obj.transform.localScale = Vector3.one * scale;
+        obj.transform.rotation = Quaternion.Euler(rotation);
+        obj.transform.position = translation;
     }
 
     // Transform Points one by one
-    Vector3[] scalePointCloud(Vector3[] pointCloud, float scale) {
-        Vector3[] scaledPointCloud = new Vector3[pointCloud.Length];
+    Vector3[] applyTRSPointCloud(Vector3[] pointCloud, 
+             Vector3 translation = default(Vector3), 
+             Vector3 rotation = default(Vector3), 
+             float scale = 1.0f) 
+    {
+        Vector3[] transformedPointCloud = new Vector3[pointCloud.Length];
 
         for(int i = 0; i < pointCloud.Length; i++) {
-            scaledPointCloud[i] = pointCloud[i] * scale;
-        }
-        return scaledPointCloud;
-    }
-    Vector3[] translatePointCloud(Vector3[] pointCloud, Vector3 translation) {
-        Vector3[] translatedPointCloud = new Vector3[pointCloud.Length];
+            Vector3 scaledPoint = pointCloud[i] * scale;
+            Vector3 rotatedPoint = Quaternion.Euler(rotation) * scaledPoint;
+            Vector3 translatedPoint = rotatedPoint + translation;
 
-        for(int i = 0; i < pointCloud.Length; i++) {
-            translatedPointCloud[i] = pointCloud[i] + translation;
+            transformedPointCloud[i] = translatedPoint;
         }
 
-        return translatedPointCloud;
+        return transformedPointCloud;
     }
 }
