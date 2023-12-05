@@ -8,7 +8,8 @@ using UnityEngine;
 public class SceneBuilder : MonoBehaviour
 {
     // Scene data
-    public Vector3[] pointCloud;
+    public Vector3[] pointCloud1;
+    public Vector3[] pointCloud2;
     public GameObject pointCloudGroup;
 
     // Scene parameters //
@@ -26,65 +27,30 @@ public class SceneBuilder : MonoBehaviour
 
         string pcName = "octahedron6";
         Vector3[] pcData = readPointCloud(pcName);
-        pcData = applyTRSPointCloud(pcData, translation: new Vector3(-8, 0, 0));
+        pcData = applyTRSPointCloud(pcData, translation: new Vector3(0, 0, 0));
         instantiatePointCloud(pointCloudGroup, pcData, pcName);
 
         pcName = "octahedron6";
         pcData = readPointCloud(pcName);
-        pcData = applyTRSPointCloud(pcData, translation: new Vector3(8, 0, 0));
+        pcData = applyTRSPointCloud(pcData, translation: new Vector3(15, 5, 0), rotation: new Vector3(0, 0, 90));
         instantiatePointCloud(pointCloudGroup, pcData, pcName + "_t");
 
-        transformPointCloudGroup();
+        fitPointCloudGroupToCameraView();
+
+        findTransformation();
     }
 
     // Update is called once per frame
     void Update() {
         if (updateScene) {
-            transformPointCloudGroup();
+            fitPointCloudGroupToCameraView();
             updateScene = false;
         }
     }
 
-    Vector3[] readPointCloud(string filename) {
-        Vector3[] vectors;
-
-        // Get text from file
-        string data;
-        string filePath = Application.dataPath + "/PointClouds/" + filename + ".xyz";
-        
-        if (File.Exists(filePath)) {
-            data = File.ReadAllText(filePath);
-            Debug.Log(data);
-        } else {
-            Debug.Log("Can't find file at " + filePath);
-            return null;
-        }
-
-        // Parse text into vector3 array
-        var lines = data.Split('\n');
-        vectors = new Vector3[lines.Length];
-
-        for (int i = 0; i < lines.Length; i++) {
-            var line = lines[i];
-            var coordinates = line.Split(' ');
-
-            var x = float.Parse(coordinates[0]);
-            var y = float.Parse(coordinates[1]);
-            var z = float.Parse(coordinates[2]);
-
-            vectors[i] = new Vector3(x, y, z);
-        }
-
-        return vectors;
-    }
-
-    void printPointCloud(Vector3[] pointCloud) {
-        foreach (var point in pointCloud) {
-            Debug.Log(point);
-        }
-    }
-
-    void transformPointCloudGroup() {
+    
+    
+    void fitPointCloudGroupToCameraView() {
         // Scene adjustments to fit in camera view  
         GameObject[] points = GameObject.FindGameObjectsWithTag("PointTag");
         foreach (var point in points) {
@@ -153,4 +119,44 @@ public class SceneBuilder : MonoBehaviour
 
         return transformedPointCloud;
     }
+
+    void printPointCloud(Vector3[] pointCloud) {
+        foreach (var point in pointCloud) {
+            Debug.Log(point);
+        }
+    }
+
+    Vector3[] readPointCloud(string filename) {
+        Vector3[] vectors;
+
+        // Get text from file
+        string data;
+        string filePath = Application.dataPath + "/PointClouds/" + filename + ".xyz";
+        
+        if (File.Exists(filePath)) {
+            data = File.ReadAllText(filePath);
+            Debug.Log(data);
+        } else {
+            Debug.Log("Can't find file at " + filePath);
+            return null;
+        }
+
+        // Parse text into vector3 array
+        var lines = data.Split('\n');
+        vectors = new Vector3[lines.Length];
+
+        for (int i = 0; i < lines.Length; i++) {
+            var line = lines[i];
+            var coordinates = line.Split(' ');
+
+            var x = float.Parse(coordinates[0]);
+            var y = float.Parse(coordinates[1]);
+            var z = float.Parse(coordinates[2]);
+
+            vectors[i] = new Vector3(x, y, z);
+        }
+
+        return vectors;
+    }
+
 }
